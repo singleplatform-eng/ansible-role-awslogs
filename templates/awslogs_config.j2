@@ -1,0 +1,6 @@
+{% for item in awslogs_config %}
+[{{item.file | regex_replace('\*', '')}}]
+{% for k,v in item.items() %}
+{{k}} = {{v}}
+{% endfor %}
+{% endfor %}
