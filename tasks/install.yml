@@ -15,4 +15,16 @@
     mode: 0600
 
 - name: Run awslogs agent setup
-  command: "/tmp/awslogs-agent-setup.py -n -r {{ec2_region | default('us-east-1')}} -c /tmp/awslogs.conf"
+  command: "{{awslogs_install_command}}"
+  ignore_errors: yes
+  register: awslogs_install
+
+# CIS versions of Ubuntu fail due to a permissions issue
+# https://forums.aws.amazon.com/thread.jspa?threadID=232057
+- block:
+    - name: Make /var/awslogs/bin/aws executable
+      file: path=/var/awslogs/bin/aws mode=0750
+
+    - name: Re-run awslogs agent setup
+      command: "{{awslogs_install_command}}"
+  when: awslogs_install|failed
