@@ -1,3 +1,4 @@
 ---
 
+awslogs_config: []
 awslogs_install_command: "python /tmp/awslogs-agent-setup.py -n -r {{ec2_region | default('us-east-1')}} -c /tmp/awslogs.conf"
