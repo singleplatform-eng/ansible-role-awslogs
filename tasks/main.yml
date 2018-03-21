@@ -1,25 +1,28 @@
 ---
+- block:
+  - name: Check if awslogs is already installed
+    stat: path=/var/awslogs/bin
+    register: awslogs_bin_dir
 
-- name: Check if awslogs is already installed
-  stat: path=/var/awslogs/bin
-  register: awslogs_bin_dir
+  - include: install.yml
+    when: not awslogs_bin_dir.stat.exists
+  when: awslogs_install
 
-- include: install.yml
-  when: not awslogs_bin_dir.stat.exists
+- block:
+  - name: Create logstream configuration
+    template:
+      src: awslogs_config.j2
+      dest: /var/awslogs/etc/config/logs
+      owner: root
+      group: root
+      mode: 0600
+    notify: restart awslogs
 
-- name: Create logstream configuration
-  template:
-    src: awslogs_config.j2
-    dest: /var/awslogs/etc/config/logs
-    owner: root
-    group: root
-    mode: 0600
-  notify: restart awslogs
+  - name: Start and enable awslogs service
+    service: name=awslogs state=started enabled=yes
+    when: ansible_distribution_release == 'trusty'
 
-- name: Start and enable awslogs service
-  service: name=awslogs state=started enabled=yes
-  when: ansible_distribution_release == 'trusty'
-
-- name: Start and enable awslogs systemd service
-  systemd: name=awslogs state=started enabled=yes daemon_reload=yes
-  when: ansible_distribution_release == 'xenial'
+  - name: Start and enable awslogs systemd service
+    systemd: name=awslogs state=started enabled=yes daemon_reload=yes
+    when: ansible_distribution_release == 'xenial'
+  when: awslogs_manage
