@@ -6,6 +6,15 @@
     dest: /tmp/awslogs-agent-setup.py
     mode: 0750
 
+- name: Ensure OS Distro is in /etc/issue
+  lineinfile:
+    path: /etc/issue
+    create: yes
+    insertbefore: BOF
+    regexp: "^{{ansible_distribution}}"
+    line: "{{ansible_lsb.description | default(ansible_distribution)}}"
+    state: present
+
 - name: Create /tmp/awslogs.conf
   copy:
     src: awslogs.conf
