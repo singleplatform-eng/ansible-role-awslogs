@@ -4,7 +4,7 @@
     stat: path=/var/awslogs/bin
     register: awslogs_bin_dir
 
-  - include: install.yml
+  - include_tasks: install.yml
     when: not awslogs_bin_dir.stat.exists
   when: awslogs_install
 
