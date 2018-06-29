@@ -36,4 +36,4 @@
 
     - name: Re-run awslogs agent setup
       command: "{{awslogs_install_command}}"
-  when: awslogs_install|failed
+  when: awslogs_install is failed
